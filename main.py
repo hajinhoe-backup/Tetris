@@ -49,7 +49,9 @@ block_t = pygame.image.load("block_t.png")
 block_z = pygame.image.load("block_z.png")
 block_name = [block_i, block_j, block_l, block_o, block_s, block_t, block_z]
 
-pygame.display.set_icon(block_name[random.randrange(0, 7)])
+ghostblock = pygame.image.load("ghostblock.png")
+
+pygame.display.set_icon(pygame.image.load("logo.png"))
 
 done = False
 
@@ -61,7 +63,7 @@ MOVE_TIME = 0
 block_wait_time = 0
 x_move = 0
 y_move = 0
-speed = 15
+speed = 30
 score = 0
 block_down = 1
 hold_block = 8
@@ -79,8 +81,8 @@ while not done:
             done = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                speed_temp = speed
-                speed = 0
+                y = gy
+                block_down = 0
             elif event.key == pygame.K_LEFT:
                 x_move = -1
                 MOVE_TIME += 1
@@ -95,7 +97,11 @@ while not done:
                     else :
                         change = 0
             elif event.key == pygame.K_DOWN:
-                y_move = 1
+                speed_temp = speed
+                if speed > 12 :
+                    speed = 12
+                else :
+                    speed = 1
             elif event.key == pygame.K_u :
                 if speed > 4 :
                     speed -= 3
@@ -112,16 +118,15 @@ while not done:
                     hold_block = now_block
                     make_piece = True
                 else :
+                    temp = now_block
                     now_block = hold_block
                     now_piece = pc_name[now_block]
-                    hold_block = 8
+                    hold_block = temp
         elif event.type == pygame.KEYUP:
             # If it is an arrow key, reset vector back to zero
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 x_move = 0
-            elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                y_move = 0
-            elif event.key == pygame.K_SPACE :
+            elif event.key == pygame.K_DOWN :
                 speed = speed_temp
 
     if gameover:
@@ -139,12 +144,10 @@ while not done:
     if make_piece == True :
         change = 0
         x = 3
-        y = 0
+        y = 2
         now_block = pre_block
         pre_block = random.randrange(0,7)
         now_piece = pc_name[now_block]
-        #for test
-        #now_piece = pc_i
         make_piece = False
 
     display_board = copy.deepcopy(board)
@@ -159,9 +162,22 @@ while not done:
     for i in range(4) :
         display_board[now_piece[change][i][1] + y][now_piece[change][i][0] + x] = 7
 
+    #ghostblock 구현
+    gy = y
+    ghostloop = True
+    while ghostloop :
+            for i in range(4) :
+                if now_piece[change][i][1] + gy == 23 or board[now_piece[change][i][1] + gy + 1][now_piece[change][i][0] + x] < 7 :
+                    ghostloop = False
+            if ghostloop :
+                gy += 1
 
     #그리자
     screen.blit(back_img, [0,0])
+
+    for i in range(4) :
+        screen.blit(ghostblock, [(MARGIN + WIDTH) * (now_piece[change][i][0] + x) + MARGIN, (MARGIN + HEIGHT) * (now_piece[change][i][1] + gy - 4) + MARGIN - 4])
+
     for row in range(4, 24) :
         for col in range(10) :
             color = BLACK
@@ -183,7 +199,7 @@ while not done:
     if TIME < speed :
         TIME += 1
     else :
-        TIME = 0
+        TIME = 10
         y += block_down
 
     if MOVE_TIME == 1 :
@@ -203,6 +219,7 @@ while not done:
                             x_move = 0
         x += x_move
         MOVE_TIME = 0
+
 
 
     #하단이 다른 블럭과 닿는 경우또는 땅에 닿는 경우와 옆에 닿는 경우를 처리
@@ -237,7 +254,7 @@ while not done:
                 if delthis :
                     del board[y + i]
                     board = [[8, 8, 8, 8, 8, 8, 8, 8, 8, 8]] + board
-                    score += 10
+                    score += 100
                     pygame.draw.rect(screen,
                                      BLACK,
                                      [0,
