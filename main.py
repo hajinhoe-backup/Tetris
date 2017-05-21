@@ -9,6 +9,10 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 BLUE  = (0, 0, 255)
 
+BLOCK_SIZE = 32
+
+#위드하이트, 마진등등... 블록사이즈로 대체합니다. 아직안했으니까 누군가 할듯 .
+
 WIDTH = 30
 HEIGHT = 30
 MARGIN = 2
@@ -63,16 +67,19 @@ MOVE_TIME = 0
 block_wait_time = 0
 x_move = 0
 y_move = 0
-speed = 30
+speed = 15
 score = 0
 block_down = 1
 hold_block = 8
 block_wait = False
+speed_temp = speed
 
 back_img = pygame.image.load("back_img.png")
 pygame.mixer.Sound("Korobeiniki.ogg").play(loops=-1)
 click_sound = pygame.mixer.Sound("click.ogg")
 effect_sound = pygame.mixer.Sound("jump-bump.ogg")
+tak_stroke = pygame.mixer.Sound("takstroke.ogg")
+
 pre_block = random.randrange(0,7)
 gameover = False
 while not done:
@@ -83,6 +90,7 @@ while not done:
             if event.key == pygame.K_SPACE:
                 y = gy
                 block_down = 0
+                score += gy * 2
             elif event.key == pygame.K_LEFT:
                 x_move = -1
                 MOVE_TIME += 1
@@ -98,8 +106,8 @@ while not done:
                         change = 0
             elif event.key == pygame.K_DOWN:
                 speed_temp = speed
-                if speed > 12 :
-                    speed = 12
+                if speed > 5 :
+                    speed = 3
                 else :
                     speed = 1
             elif event.key == pygame.K_u :
@@ -128,6 +136,11 @@ while not done:
                 x_move = 0
             elif event.key == pygame.K_DOWN :
                 speed = speed_temp
+
+    if not speed == speed_temp :
+        if TIME == 0 :
+            if block_down == 1 :
+                score += 1
 
     if gameover:
         while gameover :
@@ -199,7 +212,7 @@ while not done:
     if TIME < speed :
         TIME += 1
     else :
-        TIME = 10
+        TIME = 0
         y += block_down
 
     if MOVE_TIME == 1 :
@@ -233,6 +246,7 @@ while not done:
                         gameover = True
                     board[now_piece[change][i][1] + y][now_piece[change][i][0] + x] = now_block
                 make_piece = True
+                tak_stroke.play()
                 block_down = 1
                 block_wait = False
                 block_wait_time = 0
@@ -245,6 +259,7 @@ while not done:
             block_wait_time = 0
 
     if make_piece == True :
+        delblocknumber = 0
         for i in range(4):
             if y + i < 24 :
                 delthis = True
@@ -254,7 +269,7 @@ while not done:
                 if delthis :
                     del board[y + i]
                     board = [[8, 8, 8, 8, 8, 8, 8, 8, 8, 8]] + board
-                    score += 100
+                    delblocknumber += 1
                     pygame.draw.rect(screen,
                                      BLACK,
                                      [0,
@@ -262,10 +277,18 @@ while not done:
                                       322,
                                       32])
                     effect = True
+        if delblocknumber == 1 :
+            score += 100
+        elif delblocknumber == 2 :
+            score += 300
+        elif delblocknumber == 3 :
+            score += 600
+        elif delblocknumber == 4 :
+            score += 1000
 
     if gameover == True :
         pygame.mixer.pause()
-        pygame.mixer.Sound("gameover.wav").play()
+        pygame.mixer.Sound("gameover.ogg").play()
         screen.fill(BLUE)
         text = font.render("GAME OVER", False, WHITE)
         screen.blit(text, [160, 280])
