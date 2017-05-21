@@ -1,4 +1,7 @@
 # pygame
+
+<img src = https://github.com/hajinhoe/pygame/blob/master/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%2C%202017-05-20%2023-03-26.png>
+
 A university homework.
 
 a simple pygame tetris
