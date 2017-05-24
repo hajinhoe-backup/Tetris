@@ -99,11 +99,53 @@ while not done:
                 MOVE_TIME += 1
             elif event.key == pygame.K_UP:
                 click_sound.play()
+                if change != 3:
+                    pre_change = change + 1
+                else:
+                    pre_change = 0
                 if not block_wait :
-                    if change != 3 :
-                        change += 1
+                    for i in range(4) :
+                        if now_piece[pre_change][i][1] + y < 24 and -1 < now_piece[pre_change][i][0] + x < 10 :
+                            if board[now_piece[pre_change][i][1] + y][now_piece[pre_change][i][0] + x] < 7:
+                                pre_change = change
                     else :
-                        change = 0
+                        change = pre_change
+                elif score > 9 :
+                    up_piece = False
+                    for i in range(4) :
+                        if now_piece[pre_change][i][1] + y > 23 :
+                            up_piece = True
+                        elif now_piece[pre_change][i][1] + y < 24 and -1 < now_piece[pre_change][i][0] + x < 10 :
+                            if board[now_piece[pre_change][i][1] + y][
+                                    now_piece[pre_change][i][0] + x] < 7 :
+                                up_piece = True
+                    change_piece = True
+                    for i in range(4):
+                        if now_piece[pre_change][i][1] + y - up_piece < 24 and -1 < now_piece[pre_change][i][0] + x < 10:
+                            if board[now_piece[pre_change][i][1] + y - up_piece][now_piece[pre_change][i][0] + x] < 7 :
+                                change_piece = False
+                        else :
+                            change_piece = False
+                    if change_piece:
+                        if up_piece:
+                            y -= 1
+                        change = pre_change
+                        for i in range(4):
+                            if now_piece[change][i][1] + y == 23 or board[now_piece[change][i][1] + y + 1][
+                                        now_piece[change][i][0] + x] < 7:
+                                down = False
+                        block_wait_time = 0
+                        score -= 10
+                        gy = y
+                        ghostloop = True
+                        while ghostloop:
+                            for i in range(4):
+                                if now_piece[change][i][1] + gy == 23 or board[now_piece[change][i][1] + gy + 1][
+                                            now_piece[change][i][0] + x] < 7:
+                                    ghostloop = False
+                            if ghostloop:
+                                gy += 1
+                        y = gy
             elif event.key == pygame.K_DOWN:
                 speed_temp = speed
                 if speed > 5 :
@@ -184,6 +226,8 @@ while not done:
                     ghostloop = False
             if ghostloop :
                 gy += 1
+    if not gy == y :
+        block_down = 1
 
     #그리자
     screen.blit(back_img, [0,0])
@@ -240,23 +284,24 @@ while not done:
         if now_piece[change][i][1] + y == 23 or board[now_piece[change][i][1] + y + 1][now_piece[change][i][0] + x] < 7:
             block_wait = True
             block_down = 0
-            if block_wait_time > 15 :
+            if score > 9 :
+                if x_move != 0 :
+                    block_wait_time = 0
+                    score -= 10
+            if block_wait_time > 20 :
                 for i in range(4):
                     if now_piece[change][i][1] + y < 4 :
                         gameover = True
                     board[now_piece[change][i][1] + y][now_piece[change][i][0] + x] = now_block
                 make_piece = True
                 tak_stroke.play()
+                block_wait_time = 0
                 block_down = 1
                 block_wait = False
-                block_wait_time = 0
+            break
 
     if block_wait :
         block_wait_time += 1
-        if block_wait_time > 16 :
-            block_wait = False
-            block_down = 1
-            block_wait_time = 0
 
     if make_piece == True :
         delblocknumber = 0
