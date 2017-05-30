@@ -44,18 +44,18 @@ pc_t = [[[0,1],[1,1],[2,1],[1,2]],[[1,0],[0,1],[1,1],[1,2]],[[1,0],[0,1],[1,1],[
 pc_z = [[[0,1],[1,1],[1,2],[2,2]],[[2,0],[1,1],[2,1],[1,2]],[[0,0],[1,0],[1,1],[2,1]],[[2,0],[1,1],[2,1],[1,2]]]
 pc_name = [pc_i, pc_j, pc_l, pc_o, pc_s, pc_t, pc_z]
 
-block_i = pygame.image.load("block_i.png")
-block_j = pygame.image.load("block_j.png")
-block_l = pygame.image.load("block_l.png")
-block_o = pygame.image.load("block_o.png")
-block_s = pygame.image.load("block_s.png")
-block_t = pygame.image.load("block_t.png")
-block_z = pygame.image.load("block_z.png")
+block_i = pygame.image.load("img/block_i.png")
+block_j = pygame.image.load("img/block_j.png")
+block_l = pygame.image.load("img/block_l.png")
+block_o = pygame.image.load("img/block_o.png")
+block_s = pygame.image.load("img/block_s.png")
+block_t = pygame.image.load("img/block_t.png")
+block_z = pygame.image.load("img/block_z.png")
 block_name = [block_i, block_j, block_l, block_o, block_s, block_t, block_z]
 
-ghostblock = pygame.image.load("ghostblock.png")
+ghostblock = pygame.image.load("img/ghostblock.png")
 
-pygame.display.set_icon(pygame.image.load("logo.png"))
+pygame.display.set_icon(pygame.image.load("img/logo.png"))
 
 done = False
 
@@ -74,35 +74,84 @@ hold_block = 8
 block_wait = False
 speed_temp = speed
 
-back_img = pygame.image.load("back_img.png")
-pygame.mixer.Sound("Korobeiniki.ogg").play(loops=-1)
-click_sound = pygame.mixer.Sound("click.ogg")
-effect_sound = pygame.mixer.Sound("jump-bump.ogg")
-tak_stroke = pygame.mixer.Sound("takstroke.ogg")
+pygame.mixer.Sound("sound/Korobeiniki.ogg").play(loops=-1)
+click_sound = pygame.mixer.Sound("sound/click.ogg")
+effect_sound = pygame.mixer.Sound("sound/jump-bump.ogg")
+tak_stroke = pygame.mixer.Sound("sound/takstroke.ogg")
 
 pre_block = random.randrange(0,7)
 gameover = False
 
 intro = True
+lang = [["English", "img/back_eng.png"],["hangugeo", "img/back_ko.png"],["nihongo", "img/back_jp.png"]]
 
-def intro() :
-    while True :
-        screen.blit(pygame.image.load("main_img.png"), [0, 0])
+def intro(lang) :
+    done = False
+    i = 0
+    while not done :
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                return 9
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return i
+                    break
+                elif event.key == pygame.K_LEFT:
+                    if i != 0 :
+                        i -= 1
+                    else :
+                        i = 2
+                elif event.key == pygame.K_RIGHT:
+                    if i != 2 :
+                        i += 1
+                    else :
+                        i = 0
+        screen.blit(pygame.image.load("img/main_img.png"), [0, 0])
         font = pygame.font.SysFont('Calibri', 48, True, False)
         text = font.render(str("Press Space-bar"), False, WHITE)
         screen.blit(text, [120, 300])
-        # lang = [["English", ],["한국어", ],["NIHONGO", ]]
-        text = font.render(str("L : English"), False, WHITE)
+        text = font.render(str("< " + lang[i][0] +" >"), False, WHITE)
         screen.blit(text, [150, 400])
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    return False
         pygame.display.flip()
         clock.tick(60)
+
+start = intro(lang)
+
+if start == 9 :
+    done = True
+else :
+    back_img = pygame.image.load(lang[start][1])
+
+gradea = pygame.image.load("img/gradea.png")
+gradec = pygame.image.load("img/gradec.png")
+gradef = pygame.image.load("img/gradef.png")
+
+def info():
+    while True :
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return False
+                elif event.key == pygame.K_i:
+                    return False
+        screen.blit(pygame.image.load("img/info.png"), [70, 100])
+        pygame.display.flip()
+        clock.tick(60)
+
 while not done:
-    while intro :
-        intro = intro()
+    if score < 1000 :
+        if TIME == 10 :
+            score -= 1
+    elif score < 3000 :
+        if TIME%5 == 0 :
+            score -= 1
+    else :
+        if TIME%2 == 0 :
+            score -= 1
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -178,11 +227,8 @@ while not done:
             elif event.key == pygame.K_d :
                 if speed < 21 :
                     speed += 3
-            elif event.key == pygame.K_t :
-                if block_down == 1 :
-                    block_down = 0
-                else :
-                    block_down = 1
+            elif event.key == pygame.K_i :
+                done = info()
             elif event.key == pygame.K_h :
                 if hold_block == 8 :
                     hold_block = now_block
@@ -251,7 +297,12 @@ while not done:
 
     #그리자
     screen.blit(back_img, [0,0])
-
+    if score < 3000 :
+        screen.blit(gradef, [333, 420])
+    elif score < 10000 :
+        screen.blit(gradec, [333, 420])
+    else :
+        screen.blit(gradea, [333, 420])
     for i in range(4) :
         screen.blit(ghostblock, [(MARGIN + WIDTH) * (now_piece[change][i][0] + x) + MARGIN, (MARGIN + HEIGHT) * (now_piece[change][i][1] + gy - 4) + MARGIN - 4])
 
@@ -353,7 +404,7 @@ while not done:
 
     if gameover == True :
         pygame.mixer.pause()
-        pygame.mixer.Sound("gameover.ogg").play()
+        pygame.mixer.Sound("sound/gameover.ogg").play()
         screen.fill(BLUE)
         text = font.render("GAME OVER", False, WHITE)
         screen.blit(text, [160, 280])
