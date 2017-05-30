@@ -82,7 +82,27 @@ tak_stroke = pygame.mixer.Sound("takstroke.ogg")
 
 pre_block = random.randrange(0,7)
 gameover = False
+
+intro = True
+
+def intro() :
+    while True :
+        screen.blit(pygame.image.load("main_img.png"), [0, 0])
+        font = pygame.font.SysFont('Calibri', 48, True, False)
+        text = font.render(str("Press Space-bar"), False, WHITE)
+        screen.blit(text, [120, 300])
+        # lang = [["English", ],["한국어", ],["NIHONGO", ]]
+        text = font.render(str("L : English"), False, WHITE)
+        screen.blit(text, [150, 400])
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return False
+        pygame.display.flip()
+        clock.tick(60)
 while not done:
+    while intro :
+        intro = intro()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
