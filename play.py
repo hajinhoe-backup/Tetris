@@ -11,11 +11,6 @@ BLUE  = (0, 0, 255)
 
 BLOCK_SIZE = 32
 
-#위드하이트, 마진등등... 블록사이즈로 대체합니다. 아직안했으니까 누군가 할듯 .
-
-WIDTH = 30
-HEIGHT = 30
-MARGIN = 2
 # Call this function so the Pygame library can initialize itself
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
@@ -304,15 +299,15 @@ while not done:
     else :
         screen.blit(gradea, [333, 420])
     for i in range(4) :
-        screen.blit(ghostblock, [(MARGIN + WIDTH) * (now_piece[change][i][0] + x) + MARGIN, (MARGIN + HEIGHT) * (now_piece[change][i][1] + gy - 4) + MARGIN - 4])
+        screen.blit(ghostblock, [(BLOCK_SIZE) * (now_piece[change][i][0] + x) + 2, (BLOCK_SIZE) * (now_piece[change][i][1] + gy - 4) + 2 - 4])
 
     for row in range(4, 24) :
         for col in range(10) :
             color = BLACK
             if display_board[row][col] < 7 :
-                screen.blit(block_name[display_board[row][col]], [(MARGIN + WIDTH) * col + MARGIN, (MARGIN + HEIGHT) * (row - 4) + MARGIN - 4])
+                screen.blit(block_name[display_board[row][col]], [(BLOCK_SIZE) * col + 2, (BLOCK_SIZE) * (row - 4) + 2 - 4])
             elif display_board[row][col] == 7 :
-                screen.blit(block_name[now_block], [(MARGIN + WIDTH) * col + MARGIN, (MARGIN + HEIGHT) * (row - 4 ) + MARGIN - 4])
+                screen.blit(block_name[now_block], [(BLOCK_SIZE) * col + 2, (BLOCK_SIZE) * (row - 4 ) + 2 - 4])
     for i in range(4) :
         screen.blit(block_name[pre_block], [32 * pc_name[pre_block][0][i][0] + 360, 32 * (pc_name[pre_block][0][i][1] - 4) + 265])
 
@@ -374,6 +369,8 @@ while not done:
     if block_wait :
         block_wait_time += 1
 
+    messege_y = 0
+
     if make_piece == True :
         delblocknumber = 0
         for i in range(4):
@@ -392,22 +389,36 @@ while not done:
                                       32 * (y + i - 4),
                                       322,
                                       32])
+                    messege_y = i
                     effect = True
+        font2 = pygame.font.SysFont('Calibri', 24, True, False)
         if delblocknumber == 1 :
             score += 100
+            screen.blit(font2.render("You get 100 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
         elif delblocknumber == 2 :
             score += 300
+            screen.blit(font2.render("You get 300 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
         elif delblocknumber == 3 :
             score += 600
+            screen.blit(font2.render("You get 600 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
         elif delblocknumber == 4 :
             score += 1000
+            screen.blit(font2.render("You get 1000 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
 
     if gameover == True :
         pygame.mixer.pause()
         pygame.mixer.Sound("sound/gameover.ogg").play()
         screen.fill(BLUE)
         text = font.render("GAME OVER", False, WHITE)
+        screen.blit(text, [160, 240])
+        text = font.render("YOU GET :" + str(score), False, WHITE)
         screen.blit(text, [160, 280])
+        if score < 3000:
+            screen.blit(gradef, [180, 360])
+        elif score < 10000:
+            screen.blit(gradec, [180, 360])
+        else:
+            screen.blit(gradea, [180, 360])
 
     pygame.display.flip()
 
