@@ -145,11 +145,11 @@ while not done:
     elif score < 3000 :
         if TIME%5 == 0 :
             score -= 5
-            speed = 8
+            speed = 6
     else :
         if TIME%2 == 0 :
             score -= 20
-            speed = 5
+            speed = 2 # 2 미만으로 내리지 말 것
 
     for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다.
         if event.type == pygame.QUIT:
@@ -227,7 +227,7 @@ while not done:
                 else :
                     speed = 1
             elif event.key == pygame.K_u :
-                if speed > 4 :
+                if speed > 3 :
                     speed -= 3
             elif event.key == pygame.K_d :
                 if speed < 21 :
@@ -442,7 +442,7 @@ while not done:
 
     pygame.display.flip()
 
-    clock.tick(180)
+    clock.tick(60)
 
     gtimer += 1
 pygame.quit()
