@@ -63,7 +63,7 @@ block_wait_time = 0
 x_move = 0
 y_move = 0
 speed = 15
-score = 0
+score = 12000
 block_down = 1
 hold_block = 8
 block_wait = False
@@ -140,14 +140,17 @@ while not done:
     if score < 1000 :
         if TIME == 10 :
             score -= 1
+            speed = 10
     elif score < 3000 :
         if TIME%5 == 0 :
-            score -= 1
+            score -= 5
+            speed = 4
     else :
         if TIME%2 == 0 :
-            score -= 1
+            score -= 10
+            speed = 2
 
-    for event in pygame.event.get():
+    for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다.
         if event.type == pygame.QUIT:
             done = True
         elif event.type == pygame.KEYDOWN:
@@ -174,7 +177,7 @@ while not done:
                                 pre_change = change
                     else :
                         change = pre_change
-                elif score > 9 :
+                elif score > 9 : ##인피니트 로테이션
                     up_piece = False
                     for i in range(4) :
                         if now_piece[pre_change][i][1] + y > 23 :
@@ -191,7 +194,7 @@ while not done:
                         else :
                             change_piece = False
                     if change_piece:
-                        if up_piece:
+                        if up_piece :
                             y -= 1
                         change = pre_change
                         for i in range(4):
@@ -224,6 +227,8 @@ while not done:
                     speed += 3
             elif event.key == pygame.K_i :
                 done = info()
+            elif event.key == pygame.K_p :
+                score += 1000
             elif event.key == pygame.K_h :
                 if hold_block == 8 :
                     hold_block = now_block
@@ -268,7 +273,7 @@ while not done:
 
     display_board = copy.deepcopy(board)
 
-    for i in range(4) :
+    for i in range(4) : #보드끝에서 돌리는 경우를 허용
         if now_piece[change][i][0] + x > 9 :
             x -= 1
         elif now_piece[change][i][0] + x < 0 :
@@ -325,19 +330,20 @@ while not done:
         TIME = 0
         y += block_down
 
-    if MOVE_TIME == 1 :
+    if MOVE_TIME == 1 : ##x좌표가 겹치는 경우 처리
         if x_move != 0:
             for i in range(4):
                 if x_move == -1 :
                     if now_piece[change][i][0] + x == 0 :
                         x_move = 0
-                    elif now_piece[change][i][0] + x - 1 != 0:
+                    #elif now_piece[change][i][0] + x - 1 != 0:
+                    else:
                         if board[now_piece[change][i][1] + y][now_piece[change][i][0] + x - 1] < 7:
                             x_move = 0
                 elif x_move == 1 :
                     if now_piece[change][i][0] + x == 9 :
                         x_move = 0
-                    elif now_piece[change][i][0] + x + 1 != 9 :
+                    else: #elif now_piece[change][i][0] + x + 1 != 9 :
                         if board[now_piece[change][i][1] + y][now_piece[change][i][0] + x + 1] < 7:
                             x_move = 0
         x += x_move
@@ -371,7 +377,7 @@ while not done:
 
     messege_y = 0
 
-    if make_piece == True :
+    if make_piece == True : ##지울 경우 처리
         delblocknumber = 0
         for i in range(4):
             if y + i < 24 :
