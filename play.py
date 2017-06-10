@@ -197,6 +197,9 @@ while not done:
                     if change_piece:
                         if up_piece:
                             y -= 1
+                            for i in range(4) :
+                                if(now_piece[pre_change][i][1] + y > 23) :
+                                    y -= 1
                         change = pre_change
                         for i in range(4):
                             if now_piece[change][i][1] + y == 23 or board[now_piece[change][i][1] + y + 1][
@@ -214,6 +217,9 @@ while not done:
                             if ghostloop:
                                 gy += 1
                         y = gy
+                        for i in range(4):
+                            if (now_piece[pre_change][i][1] + y > 23):
+                                y -= 1
             elif event.key == pygame.K_DOWN:
                 speed_temp = speed
                 if speed > 5 :
