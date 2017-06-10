@@ -138,17 +138,17 @@ def info():
         clock.tick(60)
 
 while not done:
-    if score < 1000 :
+    if score < 3000 :
         if TIME == 10 :
-            score -= 1
+            score -= 3
             speed = 12
-    elif score < 3000 :
+    elif score < 10000 :
         if TIME%5 == 0 :
-            score -= 5
+            score -= 10
             speed = 6
     else :
         if TIME%2 == 0 :
-            score -= 20
+            score -= 50
             speed = 2 # 2 미만으로 내리지 말 것
 
     for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다.
