@@ -69,6 +69,7 @@ hold_block = 8
 block_wait = False
 speed_temp = speed
 gtimer = 0
+conspeed = 0
 
 pygame.mixer.Sound("sound/Korobeiniki.ogg").play(loops=-1)
 click_sound = pygame.mixer.Sound("sound/click.ogg")
@@ -140,16 +141,16 @@ def info():
 while not done:
     if score < 3000 :
         if TIME == 10 :
-            score -= 3
-            speed = 12
+            score -= 3 + conspeed
+            speed = 12 + conspeed
     elif score < 10000 :
         if TIME%5 == 0 :
-            score -= 10
-            speed = 6
+            score -= 10 + conspeed * 3
+            speed = 6 + conspeed
     else :
         if TIME%2 == 0 :
-            score -= 50
-            speed = 2 # 2 미만으로 내리지 말 것
+            score -= 50 + conspeed * 10
+            speed = 2 + conspeed # 2 미만으로 내리지 말 것
 
     for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다.
         if event.type == pygame.QUIT:
@@ -227,11 +228,11 @@ while not done:
                 else :
                     speed = 1
             elif event.key == pygame.K_u :
-                if speed > 3 :
-                    speed -= 3
+                if conspeed > 2 :
+                    conspeed -= 3
             elif event.key == pygame.K_d :
-                if speed < 21 :
-                    speed += 3
+                if conspeed < 21 :
+                    conspeed += 3
             elif event.key == pygame.K_i :
                 done = info()
             elif event.key == pygame.K_p :
