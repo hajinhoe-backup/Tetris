@@ -82,7 +82,7 @@ gameover = False
 intro = True
 lang = [["English", "img/back_eng.png"],["hangugeo", "img/back_ko.png"],["nihongo", "img/back_jp.png"]]
 
-def intro(lang) :
+def intro(lang) : #메인화면
     done = False
     i = 0
     while not done :
@@ -113,7 +113,7 @@ def intro(lang) :
         pygame.display.flip()
         clock.tick(60)
 
-start = intro(lang)
+start = intro(lang) #메인화면을 일단 불러옴
 
 if start == 9 :
     done = True
@@ -124,7 +124,7 @@ gradea = pygame.image.load("img/gradea.png")
 gradec = pygame.image.load("img/gradec.png")
 gradef = pygame.image.load("img/gradef.png")
 
-def info():
+def info(): #정보창
     while True :
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -138,8 +138,50 @@ def info():
         pygame.display.flip()
         clock.tick(60)
 
-while not done:
-    if score < 3000 :
+def hanyangi(): #하냥이창
+    x = 100
+    y = 80
+    isR = True
+    isL = False
+    count = 0
+    time = 0
+    while True :
+        if time == 120 :
+            if count > 19 :
+                return True
+            else :
+                return False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    if isR :
+                        x += 10
+                        isR = False
+                        isL = True
+                        count += 1
+                elif event.key == pygame.K_LEFT:
+                    if isL :
+                        x -= 10
+                        isL = False
+                        isR = True
+                        count +=1
+        pygame.draw.rect(screen, BLACK, [95, 50, 320, 535])
+        font = pygame.font.SysFont('Calibri', 48, True, False)
+        if count < 20 :
+            text = font.render(str("[") + str("=") * int(count/2) + str("]"), False, WHITE)
+        else :
+            text = font.render(str("[") + str("GOOOOOD") + str("]"), False, WHITE)
+        screen.blit(text, [150, 45])
+        screen.blit(pygame.image.load("img/hanyangi.jpg"), [x, y])
+        pygame.display.flip()
+        clock.tick(60)
+        time += 1
+
+
+while not done: #본게임
+    if score < 3000 : #스코어에 따라 점수 잃기 및 속도가 조절됩니다.
         if TIME == 10 :
             score -= 3 + conspeed
             speed = 12 + conspeed
@@ -152,7 +194,7 @@ while not done:
             score -= 50 + conspeed * 10
             speed = 2 + conspeed # 2 미만으로 내리지 말 것
 
-    for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다.
+    for event in pygame.event.get(): #테스트를 위하여 P를 누르면 100점씩 증가합니다. 기능키들이 모여있습니다.
         if event.type == pygame.QUIT:
             done = True
         elif event.type == pygame.KEYDOWN:
@@ -253,19 +295,19 @@ while not done:
             elif event.key == pygame.K_DOWN :
                 speed = speed_temp
 
-    if not speed == speed_temp :
+    if not speed == speed_temp : #소프트 드랍시 점수 제공을 위해서임.
         if TIME == 0 :
             if block_down == 1 :
                 score += 1
 
-    if gameover:
+    if gameover: #게임오버 화면 표출
         while gameover :
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     gameover = False
                     done = True
 
-    if effect == True :
+    if effect == True : #블럭 지워질떄용임
         effect_sound.play()
         pygame.time.wait(100)
         effect = False
@@ -379,12 +421,12 @@ while not done:
                 block_wait = False
             break
 
-    if block_wait :
+    if block_wait : #인피니트 로테이션 위함
         block_wait_time += 1
 
-    messege_y = 0
+    messege_y = 0 #블럭지우면점수 뜨는 거
 
-    if make_piece == True :
+    if make_piece == True : #새로운 블럭이 만들어질 떄, 이전 블럭으로 인해 지워지는지 확인함.
         delblocknumber = 0
         for i in range(4):
             if y + i < 24 :
@@ -405,7 +447,7 @@ while not done:
                     messege_y = i
                     effect = True
         font2 = pygame.font.SysFont('Calibri', 24, True, False)
-        if delblocknumber == 1 :
+        if delblocknumber == 1 : #점수확인을 위함
             score += 100
             screen.blit(font2.render("You get 100 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
         elif delblocknumber == 2 :
@@ -418,7 +460,7 @@ while not done:
             score += 1000
             screen.blit(font2.render("You get 1000 point", False, WHITE), [128, 32 * (y + messege_y - 4)])
 
-    if gameover == True :
+    if gameover == True : #게임을 일찍 끝내면 점수를 낮추고 늦게 끝내면 추가점수를 준다
         if gtimer < 100000 :
             score -= 50000
         elif gtimer < 300000 :
@@ -441,9 +483,21 @@ while not done:
         else:
             screen.blit(gradea, [180, 360])
 
+    if random.randrange(0,10000)  == 1 : #하냥이에 성공하면 점수를 주고, 판을 지워준다.
+        if hanyangi() :
+            for i in range(20) :
+                del board[23]
+                board = [[8, 8, 8, 8, 8, 8, 8, 8, 8, 8]] + board
+            score += 30000
+            effect_sound.play()
+            pygame.time.wait(50)
+            effect_sound.play()
+            pygame.time.wait(50)
+            effect_sound.play()
+
     pygame.display.flip()
 
     clock.tick(60)
 
-    gtimer += 1
+    gtimer += 1 #실행 시간 계산을 위함
 pygame.quit()
